@@ -75,3 +75,18 @@ singularity exec /path to gromacs_cp2k-f.sif gmx_cp2k --version
 
 # this progress might produce huge cache file so i recommend you change the singularity tmp_dir to the proper location 
 ```
+
+#### ***4. Submit mission on the slurm cluster***
+
+if you want to run gromacs_cp2k_singularity on the slurm cluster, i have provided a slurm template below, and this will not be influenced by the mpirun version which have been installed on your cluster. 
+
+```shell
+#!/bin/bash
+#SBATCH -J nma-em
+#SBATCH -p CondaPereira-PC
+#SBATCH -N 1
+#SBATCH --mail-user=szkchris@sina.com
+#SBATCH --mail-type=ALL
+
+mpirun -np 8 /software/gromacs_cp2k_v2/gromacs_cp2k-v2.sif gmx_cp2k mdrun -v -deffnm nma-em
+```
