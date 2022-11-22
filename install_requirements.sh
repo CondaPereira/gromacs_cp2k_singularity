@@ -6,19 +6,19 @@
 # https://github.com/koalaman/shellcheck
 # https://clang.llvm.org/docs/ClangFormat.html
 export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
-apt-get update -qq
-apt-get install -qq --no-install-recommends \
-  ca-certificates \
-  clang-format \
-  git \
-  less \
-  nano \
-  python3 \
-  python3-pip \
-  python3-wheel \
-  python3-setuptools \
-  shellcheck \
-  wget
+# apt-get update -qq
+# apt-get install -qq --no-install-recommends \
+#  ca-certificates \
+#  clang-format \
+#  git \
+#  less \
+#  nano \
+#  python3 \
+#  python3-pip \
+#  python3-wheel \
+#  python3-setuptools \
+#  shellcheck \
+#  wget
 rm -rf /var/lib/apt/lists/*
 
 # Install Python packages. Upgrade via:
