@@ -1,0 +1,52 @@
+# Rosetta2Go
+# GitHub - CondaPereira/Rosetta2Go: Package Rosetta in Docker or Singularity
+# MIT License
+# Copyright (c) 2022 CondaPereira <CondaPereira - Overview>
+
+Bootstrap: docker
+From: alpine:3.12
+Stage: build
+
+%files
+
+    openmpi-4.1.4.tar.bz2 /tmp
+    rosetta_src_3.13_bundle.tgz /tmp
+
+%post
+
+    export filename=`ls -t /tmp | sed -n '2p' | awk '{print $0}'` \
+    && echo $filename \
+    && set -x; buildDeps='g++ boost boost-dev libexecinfo-dev libexecinfo sqlite build-base coreutils gcc bash python3 py3-pip openssh libc6-compat make zlib curl pigz zlib-dev perl linux-headers python3' \
+    && export DEBIAN_FRONTEND=noninteractive \
+    && ln -s /usr/bin/python3 /usr/bin/python \
+    && sed -i "s/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g" /etc/apk/repositories \
+    && apk --update add --no-cache $buildDeps \
+    && cd /tmp/$filename/rootfs/tmp \
+    && ls \
+    && tar -xvf openmpi-4.1.4.tar.bz2 \
+    && cd openmpi-4.1.4 \
+    && ./configure --prefix=/opt/openmpi \
+    && make install -j 16 \
+    && cd .. \
+    && rm -rf openmpi-4.1.4.tar.bz2 openmpi-4.1.4
+
+%post
+    
+    export PATH=$PATH:/opt/openmpi/bin \
+    && export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/openmpi/lib \
+    && cd /tmp/$filename/rootfs/tmp \
+    && tar -xvf rosetta_src_3.13_bundle.tgz \
+    && rm -rf rosetta_src_3.13_bundle.tgz \
+    && cd rosetta_src_2021.16.61629_bundle/main/source \
+    && echo ./scons.py -j 16 mode=release bin extras=mpi >> build.sh \
+    && chmod +x build.sh \
+    && ./build.sh 
+
+%environment
+    export PATH=$PATH:/opt/openmpi/bin
+    export LD_LIBRARY_PATH=/opt/openmpi/lib
+    export OMPI_ALLOW_RUN_AS_ROOT=1
+    export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+    export PATH=/rosetta/main/source/bin:$PATH
+    export LIB_LIBRARY_PATH=/rosetta/main/source/bin:$LIB_LIBRARY_PATH
+
